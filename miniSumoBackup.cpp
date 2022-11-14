@@ -10,6 +10,12 @@ int izqB = 5;
 int derA = 6;
 int derB = 9;
 
+// PIN DIGITAL DEL BOTÓN/TOGGLE
+int buttonPin = 8;
+int buttonState = LOW;
+int carState = LOW;
+bool pressed;
+
 // SENSORQTR
 const int ECHO = 10;
 const int TRIG = 11;
@@ -19,7 +25,6 @@ const int SPEED = 255;
 
 void setup(){
     Serial.begin(9600);
-    delay (5000); // TIEMPO DE SEGURIDAD
 
     //sesnor ultrasonico
     pinMode(ECHO, INPUT);
@@ -30,10 +35,45 @@ void setup(){
     pinMode(derB, OUTPUT);
     pinMode(izqA, OUTPUT);
     pinMode(izqB, OUTPUT);
+
+    //boton
+    pinMode(buttonPin, INPUT_PULLUP); // usa la resistencia pullup interna para hacer la señal alta a menos que venga de otra fuente
+}
+
+void loop(){
+    checkState();
+    buttonState = digitalRead(buttonPin);
+    if(buttonState == LOW) {
+        if(pressed == false) {
+            changeState(&carState);
+            pressed = true;
+        }
+    }
+    else {
+    	pressed = false;
+    }
+
+}
+
+void checkState(){
+	if(carState == LOW)
+        stop();
+  	else
+        handleCar();
 }
 
 
-void loop(){
+void changeState(int *state) {
+  if(*state == LOW){
+    delay(5000); // TIEMPO DE SEGURIDAD CADA VEZ QUE SE PRENDE
+    *state = HIGH;
+  }
+  else {
+    *state = LOW;
+  }
+}
+
+void handleCar(){
     //lectura de sesnores IR
     lectura_ir1 = digitalRead(SENSOR_IR1);
     lectura_ir1 = digitalRead(SENSOR_IR1);
